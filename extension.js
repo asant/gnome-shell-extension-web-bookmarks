@@ -2,7 +2,7 @@
 /*
  * GNOME Shell extension that aims at integrating the Web/Epiphany
  * bookmarks into the shell.
- * Copyright (C) 2012  Andrea Santilli <andresantilli gmx com>
+ * Copyright (C) 2012  Andrea Santilli <andreasantilli gmx com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
