@@ -138,6 +138,7 @@ EphyBookmarkSearchProvider.prototype = {
         this.data = entries;
     },
 
+    /* used by shell v3.2.x */
     getResultMeta: function(id) {
         let app_sys = Shell.AppSystem.get_default();
         let app = app_sys.lookup_heuristic_basename(ENTRY_NAME);
@@ -151,6 +152,7 @@ EphyBookmarkSearchProvider.prototype = {
         };
     },
 
+    /* used by shell v3.3.x and upper */
     getResultMetas: function(ids) {
         let app_sys = Shell.AppSystem.get_default();
         let app = app_sys.lookup_heuristic_basename(ENTRY_NAME);
@@ -233,11 +235,11 @@ EphyBookmarkMenuItem.prototype = {
     }
 };
 
-function EphyBookmarksMenu() {
+function EphyBookmarkMenu() {
     this._init.apply(this, arguments);
 }
 
-EphyBookmarksMenu.prototype = {
+EphyBookmarkMenu.prototype = {
     __proto__: PanelMenu.Button.prototype,
 
     _init: function(params)
@@ -261,11 +263,11 @@ EphyBookmarksMenu.prototype = {
     }
 };
 
-function EphyBookmarksManager() {
+function EphyBookmarkManager() {
     this._init.apply(this, arguments);
 }
 
-EphyBookmarksManager.prototype = {
+EphyBookmarkManager.prototype = {
     _init: function(path, mode, params) {
         let data;
 
@@ -277,7 +279,7 @@ EphyBookmarksManager.prototype = {
         }
 
         if (this.mode & ModeType.MENU) {
-            this.panelmenu = new EphyBookmarksMenu();
+            this.panelmenu = new EphyBookmarkMenu();
         }
 
         /* this always returns json data of a given structure */
@@ -350,9 +352,19 @@ EphyBookmarksManager.prototype = {
         }
 
         for each (let item in data.contents) {
-            let entry = new EphyBookmarkMenuItem(
-                item.title, item.link);
-            ab_insert(entry, this.panelmenu.menu);
+            if (this.mode & ModeType.MENU) {
+                let entry = new EphyBookmarkMenuItem(
+                    item.title, item.link);
+                ab_insert(entry, this.panelmenu.menu);
+            }
+
+            if (this.mode & ModeType.SEARCH) {
+                search_entries.push({
+                    'pos'   :   search_entries.length,
+                    'name'  :   item.title,
+                    'url'   :   item.link
+                });
+            }
         }
 
         if (this.mode & ModeType.SEARCH) {
@@ -446,7 +458,7 @@ function init(metadata) {}
 function enable() {
     let mode = ModeType.MENU | ModeType.SEARCH;
 
-    manager = new EphyBookmarksManager(DEFAULT_BK_FILE, mode);
+    manager = new EphyBookmarkManager(DEFAULT_BK_FILE, mode);
 }
 
 function disable() {
